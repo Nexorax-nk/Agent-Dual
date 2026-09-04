@@ -1,0 +1,117 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  asin        String   @unique
+  title       String
+  imgUrl      String?
+  productUrl  String?
+  stars       Float    @default(0)
+  reviews     Int      @default(0)
+  price       Float    @default(0)
+  category    String
+  isBestSeller Boolean @default(false)
+  boughtInLastMonth Int @default(0)
+  createdAt   DateTime @default(now())
+  
+  cartItems      CartItem[]
+  orderItems     OrderItem[]
+  recommendations Recommendation[]
+  
+  @@index([category])
+  @@index([price])
+  @@index([stars])
+  @@index([reviews])
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  address   String?
+  createdAt DateTime @default(now())
+  
+  cartItems      CartItem[]
+  orders         Order[]
+  addresses      Address[]
+  paymentMethods PaymentMethod[]
+  recommendations Recommendation[]
+}
+
+model Address {
+  id      String @id @default(cuid())
+  userId  String
+  street  String
+  city    String
+  country String
+  
+  user    User   @relation(fields: [userId], references: [id])
+  orders  Order[]
+}
+
+model PaymentMethod {
+  id       String @id @default(cuid())
+  userId   String
+  cardType String
+  last4    String
+  
+  user     User   @relation(fields: [userId], references: [id])
+  orders   Order[]
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  userId    String
+  productId String
+  quantity  Int      @default(1)
+  addedBy   String   @default("user") // "user" or "agent"
+  
+  user      User     @relation(fields: [userId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
+  
+  @@unique([userId, productId])
+}
+
+model Recommendation {
+  id        String   @id @default(cuid())
+  userId    String
+  productId String
+  reason    String
+  createdAt DateTime @default(now())
+  
+  user      User     @relation(fields: [userId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
+}
+
+model Order {
+  id              String   @id @default(cuid())
+  userId          String
+  status          String   @default("Processing") // Processing, Shipped, Out for delivery, Delivered, Cancelled
+  total           Float
+  addressId       String?
+  paymentMethodId String?
+  createdAt       DateTime @default(now())
+  
+  user          User           @relation(fields: [userId], references: [id])
+  address       Address?       @relation(fields: [addressId], references: [id])
+  paymentMethod PaymentMethod? @relation(fields: [paymentMethodId], references: [id])
+  items         OrderItem[]
+}
+
+model OrderItem {
+  id        String   @id @default(cuid())
+  orderId   String
+  productId String
+  quantity  Int
+  priceAtBuy Float
+  
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id])
+}
