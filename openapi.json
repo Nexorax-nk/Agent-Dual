@@ -1,0 +1,286 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "WebMCPStore God-Mode API",
+    "description": "API for ChatGPT to fully control the WebMCPStore e-commerce platform.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{YOUR_TUNNEL_URL}",
+      "description": "Local development server exposed via tunnel"
+    }
+  ],
+  "paths": {
+    "/api/search": {
+      "get": {
+        "operationId": "searchProducts",
+        "summary": "Search the product catalog",
+        "parameters": [
+          { "name": "q", "in": "query", "required": true, "schema": { "type": "string" } },
+          { "name": "category", "in": "query", "required": false, "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "Successful response" } }
+      }
+    },
+    "/api/product": {
+      "get": {
+        "operationId": "getProductDetails",
+        "summary": "Get detailed metadata for a specific product",
+        "parameters": [
+          { "name": "asin", "in": "query", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "Successful response" } }
+      }
+    },
+    "/api/deals": {
+      "get": {
+        "operationId": "getTodaysDeals",
+        "summary": "Get today's top deals and best sellers",
+        "responses": { "200": { "description": "Successful response" } }
+      }
+    },
+    "/api/cart": {
+      "get": {
+        "operationId": "viewCart",
+        "summary": "View current shopping cart contents",
+        "responses": { "200": { "description": "Successful response" } }
+      },
+      "post": {
+        "operationId": "addToCart",
+        "summary": "Add a product to the cart",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "productId": { "type": "string" },
+                  "quantity": { "type": "number", "default": 1 }
+                },
+                "required": ["productId"]
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Successful response" } }
+      },
+      "delete": {
+        "operationId": "removeFromCart",
+        "summary": "Remove a specific item from the cart",
+        "parameters": [
+          { "name": "id", "in": "query", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "Successful response" } }
+      }
+    },
+    "/api/cart/update": {
+      "post": {
+        "operationId": "updateCartQuantity",
+        "summary": "Update the exact quantity of a cart item",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "productId": { "type": "string" },
+                  "quantity": { "type": "number" }
+                },
+                "required": ["productId", "quantity"]
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Successful response" } }
+      }
+    },
+    "/api/cart/clear": {
+      "post": {
+        "operationId": "clearCart",
+        "summary": "Empty the entire cart",
+        "responses": { "200": { "description": "Successful response" } }
+      }
+    },
+    "/api/profile": {
+      "get": {
+        "operationId": "getUserProfile",
+        "summary": "Get user profile, saved addresses, and payment methods",
+        "responses": { "200": { "description": "Successful response" } }
+      }
+    },
+    "/api/checkout": {
+      "post": {
+        "operationId": "checkoutOrder",
+        "summary": "Checkout and place an order",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "address": { "type": "string" },
+                  "paymentMethod": { "type": "string" }
+                },
+                "required": ["address", "paymentMethod"]
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Successful response" } }
+      }
+    },
+    "/api/orders": {
+      "get": {
+        "operationId": "viewOrders",
+        "summary": "View order history and delivery status",
+        "responses": { "200": { "description": "Successful response" } }
+      }
+    },
+    "/api/reviews": {
+      "post": {
+        "operationId": "leaveProductReview",
+        "summary": "Submit a 1-5 star review for a product",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "productId": { "type": "string" },
+                  "stars": { "type": "number" },
+                  "comment": { "type": "string" }
+                },
+                "required": ["productId", "stars", "comment"]
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Successful response" } }
+      }
+    },
+    "/api/profile/address": {
+      "get": {
+        "operationId": "getAddresses",
+        "summary": "Get user saved addresses",
+        "responses": { "200": { "description": "Successful response" } }
+      },
+      "post": {
+        "operationId": "addAddress",
+        "summary": "Add a new address",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "street": { "type": "string" },
+                  "city": { "type": "string" },
+                  "country": { "type": "string" }
+                },
+                "required": ["street", "city", "country"]
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Successful response" } }
+      },
+      "delete": {
+        "operationId": "deleteAddress",
+        "summary": "Delete a saved address",
+        "parameters": [
+          { "name": "id", "in": "query", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "Successful response" } }
+      }
+    },
+    "/api/profile/payment": {
+      "get": {
+        "operationId": "getPaymentMethods",
+        "summary": "Get user saved payment methods",
+        "responses": { "200": { "description": "Successful response" } }
+      },
+      "post": {
+        "operationId": "addPaymentMethod",
+        "summary": "Add a new payment method",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "cardType": { "type": "string" },
+                  "last4": { "type": "string" }
+                },
+                "required": ["cardType", "last4"]
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Successful response" } }
+      },
+      "delete": {
+        "operationId": "deletePaymentMethod",
+        "summary": "Delete a saved payment method",
+        "parameters": [
+          { "name": "id", "in": "query", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "Successful response" } }
+      }
+    },
+    "/api/recommendations": {
+      "get": {
+        "operationId": "getRecommendations",
+        "summary": "Get AI recommendations",
+        "responses": { "200": { "description": "Successful response" } }
+      },
+      "post": {
+        "operationId": "addRecommendation",
+        "summary": "Push an AI recommendation for a user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "productId": { "type": "string" },
+                  "reason": { "type": "string" }
+                },
+                "required": ["productId", "reason"]
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Successful response" } }
+      }
+    },
+    "/api/orders/approve": {
+      "post": {
+        "operationId": "approveOrder",
+        "summary": "Approve a pending order to Processing state",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "orderId": { "type": "string" }
+                },
+                "required": ["orderId"]
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Successful response" } }
+      }
+    }
+  }
+}
